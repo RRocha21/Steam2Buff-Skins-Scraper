@@ -1,0 +1,38 @@
+{
+  "main": {
+    "debug": false,
+    "game": "cs2",
+    "game_appid": "730",
+    "accept_buff_threshold": 1.10,
+    "accept_steam_threshold": 1.23,
+    "accept_buy_order_threshold": 1.23,
+    "min_volume": 0,
+    "min_price": 1000, 
+    "max_price": 350000  
+  },
+  "buff": {
+    "request_interval": 1,
+    "requests_kwargs": {
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
+        "Referer": "https://buff.163.com/market/csgo",
+        "X-Requested-With": "XMLHttpRequest",
+        "Cookie": "session=1-oz3WtTBnfIbm0p232UxFJ1AUZsz-d-ARb3_4BzSnYfU82027158673;remember_me=U1075667913|cWvVvnsGp2IYqaxPiMmWJmPbuTysIKpS"
+      }
+    }
+  },
+  "steam": {
+    "request_interval": 1,
+    "requests_kwargs": {
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+      }
+    }
+  },
+  "mongo": {
+    "uri": "mongodb+srv://RRocha21:benfica10@buff.umt3iuw.mongodb.net/?retryWrites=true&w=majority"
+  },
+  "postgres": {
+    "uri": "postgresql://doadmin:AVNS_GRvfxsqSGM1kpyI0Gqr@db-steam-buff-bot-do-user-13097918-0.c.db.ondigitalocean.com:25061/Pool1"
+  }
+}
