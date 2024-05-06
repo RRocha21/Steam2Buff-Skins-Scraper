@@ -1,7 +1,7 @@
 import aiohttp
 import json
 from datetime import datetime
-from buff2steam import logger
+from steam2buff import logger
 
 class Postgres:
     base_url = 'http://192.168.3.31:8000'
@@ -125,3 +125,26 @@ class Postgres:
                 
         except Exception as e:
             logger.error(f'Failed to insert item nameid: {e}')
+            
+    async def insert_one_steam_2_search(self, document):
+        try:
+            buffUrl = document['buffUrl']
+            steamUrl = document['steamUrl']
+            skinName = document['skinName']
+            buffId = document['buffId']
+            maxFloat = document['maxFloat']
+            maxFloatRounded = round(float(maxFloat), 3)
+
+
+            url = f'{self.base_url}/steam_links_search'
+            
+            async with self.session.post(url, params={
+                'buffUrl': buffUrl,
+                'steamUrl': steamUrl,
+                'skinName': skinName,
+                'buffId': buffId,
+                'maxFloat': maxFloatRounded
+            }) as response:
+                response.raise_for_status()
+        except Exception as e:
+            logger.error(f'Failed to insert document into PostgreSQL: {e}')

@@ -4,8 +4,8 @@ import time
 
 import httpx
 
-from buff2steam import logger
-from buff2steam.exceptions import BuffError
+from steam2buff import logger
+from steam2buff.exceptions import BuffError
     
 class Buff:
     base_url = 'https://buff.163.com'

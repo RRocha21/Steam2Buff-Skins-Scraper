@@ -3,26 +3,25 @@
     "debug": false,
     "game": "cs2",
     "game_appid": "730",
-    "accept_buff_threshold": 1.10,
-    "accept_steam_threshold": 1.23,
-    "accept_buy_order_threshold": 1.23,
+    "accept_buff_threshold": 1.03,
+    "accept_steam_threshold": 1.038,
+    "accept_buy_order_threshold": 1.03,
     "min_volume": 0,
     "min_price": 1000, 
-    "max_price": 350000  
+    "max_price": 50000  
   },
   "buff": {
-    "request_interval": 1,
+    "request_interval": 60,
     "requests_kwargs": {
       "headers": {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
         "Referer": "https://buff.163.com/market/csgo",
-        "X-Requested-With": "XMLHttpRequest",
-        "Cookie": "session=1-oz3WtTBnfIbm0p232UxFJ1AUZsz-d-ARb3_4BzSnYfU82027158673;remember_me=U1075667913|cWvVvnsGp2IYqaxPiMmWJmPbuTysIKpS"
+        "X-Requested-With": "XMLHttpRequest"
       }
     }
   },
   "steam": {
-    "request_interval": 1,
+    "request_interval": 15,
     "requests_kwargs": {
       "headers": {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
@@ -31,6 +30,24 @@
   },
   "mongo": {
     "uri": "mongodb+srv://RRocha21:benfica10@buff.umt3iuw.mongodb.net/?retryWrites=true&w=majority"
+  },
+  "sheets": {
+    "credentials": {
+        "type": "service_account",
+        "project_id": "buff-bot",
+        "private_key_id": "e6cdb8b80af6b7f0c6a23f548494873754a4d63b",
+        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDWcQ6Yj1jh11F8\nSs45GKCnVxU8+G+cajskUHuTs0/UYl8N3k/f+Bh+IlZTyHOYtGKiNoQXZuobEymB\nCRIFy+Kt+1GQcxA+x+XlAK9b+YHKhFR7O5S8ppnPLvknsPONtV2AHkzN555X2HMT\nRgU/BCYMmftV72BQUSP07vQ0rXTJDb0azjfjXcDKBrY2oZeXiBbrkrj7weNYLYOz\nCLxsvyjGpoJpknIP1KoumL7EVCy8zFKz4e3CvftUHTrwDb/4dHiVq4PJ0EOkHTRb\n/8Zer37DAfeT9vtCw7GAvJtPqpjA8Lsno5Ou7XEO0PYQO2Ru6o+pFZxXbmlG18YI\nQ3zSz/OXAgMBAAECggEASce/Sl0zqwxutFF2j616BOlQ3NfraskgDRgF1KUip8Oq\nybY+DCSrpKZCxnPW1ejmcMJKA1U84dDffE53HXhvRwYLo6P7KGaVogtwyjfX4KpT\n+MxgmeHGVMLoJbBbs9t9ToneSg/Rao8F1NFIF8zhHH/UOlZwcGHiebDHY+J0JoIK\n3T60hlU1wITddHr/pgux3pmkIWoRLluesQV4rPsqcOlr0UELG62BHxBxDwPuJQR2\nPH9on3oT3l4Xd9WWiq94uuHeIu++/HFIo6Ic4hVey4+YeFGOe93fTmZg24eZQ/zw\nwzyQvZgXmJNPAX0NZ2792JHXwLazNqG4Wo3/P0wbqQKBgQDr9truqTHCe0rvHUwa\nehhZnY27oRQJINlrEhhwQuere4U14T0Uzl0vRVooB1iGDLZhxRsTe6hbwoSXjJDA\n2jzspb0HggthoB5iukFvtz/fBwzygble0oFN1B0V+hrb/z6V1X3++0Kxxsw3FgJq\nB/yhxSNPfk9/rGZom68Rx6hK7wKBgQDopl1uQuN2Otu0Gdhp4FWznfay69t1IgDq\naGLQ6ZnTKFtBRhUz4Ef5eKcuBAyVL/N7IZwLLAb6s8xsKr/ech+ZCPEaKWCrCm9x\nVvZMerCVUX4jlZBlXU/y6+pr3TeJLAGCGpAe27787BSfZ/xUera3B9IfCuZczqPx\nrw+MBvqB2QKBgAgiKyu800VD4LJbTStAeCRmpOMJy1oBMt1Y81SzSa8Eg/P2fpeA\nAYBGoLPuhOOh/otiMuu6AHShQNbEdpzfKOhzUg+3MNM9pK58gxLpux7h7FVTmWMm\nWGSpYhNG2rQomSyq/jvSx1q/Ynynmo+zFMcyt2PfE7hv5dvHOgKf4jIrAoGAHx5R\nlPQBdMj+piJm3hKRpArW+qutmQdJVBFOVl9IogPd4Oc84sl3FxlaUz9bZ4EYcjnW\no2/qJxJxn25AZ8KgE1os1bD/KyGkMmbNXwFyKSbTVnMk80n97aI8otzeFsz6Dqr6\n6AXAkBgL0h6Yk7wuQGEda+WLVpKVPziJPdOZIlECgYEAwzoz8tKkWv+K+pSyS0x1\nv26Mvr+/K6psUZMUOXWbps3G9lXhAJ3H5Ni/zdUtUbJqiIVkvjq5Zx9NovOWuCao\nQC/YsduOroVXZT3y4l+8VMk6+Fd1RnxsIo5UENB5UOiwuGUnFLHMX/h9AVLADMTW\nu39TnLbUucjMIZNCeXLnS54=\n-----END PRIVATE KEY-----\n",
+        "client_email": "buff-bot@buff-bot.iam.gserviceaccount.com",
+        "client_id": "111028740226853209488",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/buff-bot%40buff-bot.iam.gserviceaccount.com",
+        "universe_domain": "googleapis.com"
+    },
+    "sheet_id": "skins trade",
+    "sheet_name": "skins trade",
+    "file_name": "Buff163-Skins"
   },
   "postgres": {
     "uri": "postgresql://doadmin:AVNS_GRvfxsqSGM1kpyI0Gqr@db-steam-buff-bot-do-user-13097918-0.c.db.ondigitalocean.com:25061/Pool1"
