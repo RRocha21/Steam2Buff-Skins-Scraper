@@ -12,7 +12,7 @@ from aiohttp_socks import ProxyConnector
 import urllib.parse
 
 import decimal
-from buff2steam import logger
+from steam2buff import logger
 
 def get_currency_from_id(currency_id):
     # Remove the first 2 characters from currency_id
