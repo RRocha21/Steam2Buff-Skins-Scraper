@@ -148,3 +148,15 @@ class Postgres:
                 response.raise_for_status()
         except Exception as e:
             logger.error(f'Failed to insert document into PostgreSQL: {e}')
+            
+    async def fetch_steam_2_search(self):
+        try:
+            url = f'{self.base_url}/steam_links_search'
+            async with self.session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data
+                return None
+        except Exception as e:
+            logger.error(f'Failed to fetch steam 2 search: {e}')
+            return None

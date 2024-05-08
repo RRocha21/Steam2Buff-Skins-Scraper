@@ -7,7 +7,6 @@ from steam2buff.provider.buff import Buff
 from steam2buff.provider.steam import Steam
 from steam2buff.provider.rates import Rates
 from steam2buff.provider.postgres import Postgres
-from steam2buff.provider.sheets import Sheets
 
 import random
 
@@ -23,16 +22,70 @@ async def reset_visited():
         await asyncio.sleep(300)  # 300 seconds = 5 minutes
         visited.clear()
 
-async def main_loop(buff, steam, rates, postgres, sheets):
-    logger.info(f'Fetching data from Google Sheets...')
-    sheet_data = await sheets.fetch_all()
-    logger.info(f'Fetched {len(sheet_data)} items from Google Sheets')
+async def main_loop(buff, steam, rates, postgres):
+    global visited
+    logger.info('Starting main loop...')
+    await steam.get_proxy_list()
     
-    for item in sheet_data:
-        await asyncio.sleep(0.1)
-        logger.info(f'Fetching {item}')
-        await postgres.insert_one_steam_2_search(item)
+    psql_exchange_rates = await postgres.find_exchange_rate()
 
+    exchange_rates_json = psql_exchange_rates.get('rates')  # Extracting exchange rates dictionary
+    last_updated_str = psql_exchange_rates.get('updatedat')        # Extracting last updated timestamp
+    last_updated = datetime.strptime(last_updated_str, '%Y-%m-%dT%H:%M:%S.%f')
+    # Converting exchange rates dictionary to JSON string
+    # Parsing exchange rates JSON string back to dictionary
+    exchange_rates = json.loads(exchange_rates_json)
+    
+    if (datetime.now() - last_updated).total_seconds() > 43200:
+        new_exchange_rates = await rates.get_exchanges_rates_from_api()
+        psql_rate = {
+            'id': 1,
+            'rates': new_exchange_rates,
+            'updatedAt': datetime.now(),
+        }
+        await postgres.update_rates(psql_rate)   
+        exchange_rates = new_exchange_rates 
+    
+    
+    loop_size = 100
+    
+    for i in range(0, loop_size):
+        data = await postgres.fetch_steam_2_search()
+
+        for item in data:
+            # Fetch min price from Steam
+            steam_price = await steam.get_min_price(item['market_hash_name'])
+            
+            if steam_price is None:
+                continue
+            
+            # Fetch min price from Buff starting on the max float
+            
+            # buff_min_price = await buff.get_min_price(item['market_hash_name'], steam_price)
+            
+            # if buff_min_price is None:
+            #     continue
+            
+            # # Calculate profit in percentage
+            # profit = (buff_min_price - steam_price) / steam_price * 100
+            
+            # # Check if the item is profitable or until 10% loss
+            # if profit >= 10:
+            #     if item['market_hash_name'] not in visited:
+            #         visited.add(item['market_hash_name'])
+                    
+            #         # Insert item into PostgreSQL
+            #         await postgres.insert_steam_2_buff({
+            #             'market_hash_name': item['market_hash_name'],
+            #             'steam_price': steam_price,
+            #             'buff_min_price': buff_min_price,
+            #             'profit': profit
+            #         })
+            #         logger.info(f'Item {item["market_hash_name"]} is profitable: {profit:.2f}%')
+            #     else:
+            #         logger.info(f'Item {item["market_hash_name"]} is already visited')
+            # else:
+            #     logger.info(f'Item {item["market_hash_name"]} is not profitable: {profit:.2f}%')
 
 
 async def main():
@@ -67,13 +120,8 @@ async def main():
                 request_interval = 10,
             ) as rates, Postgres(
                 request_interval = 10,
-            ) as postgres, Sheets(
-                credentials=config['sheets']['credentials'],
-                sheet_id=config['sheets']['sheet_id'],
-                sheet_name=config['sheets']['sheet_name'],
-                file_name=config['sheets']['file_name'],
-            ) as sheets:
-                await main_loop(buff, steam, rates, postgres, sheets)
+            ) as postgres:
+                await main_loop(buff, steam, rates, postgres)
     except KeyboardInterrupt:
         exit('Bye~')
 
