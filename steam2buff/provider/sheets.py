@@ -100,7 +100,8 @@ class Sheets:
                     'buffId': row[2],
                     'skinName': row[3],
                     'steamUrl': row[5],
-                    'maxFloat': row[6].replace(',', '.')
+                    'maxFloat': row[7].replace(',', '.'),
+                    'minFloat': row[6].replace(',', '.')
                 }
                 logger.info(f'Row Data: {row_data}')
 

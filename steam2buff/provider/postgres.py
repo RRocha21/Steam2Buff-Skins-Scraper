@@ -133,7 +133,10 @@ class Postgres:
             skinName = document['skinName']
             buffId = document['buffId']
             maxFloat = document['maxFloat']
+            minFloat = document['minFloat']
             maxFloatRounded = round(float(maxFloat), 3)
+            minFloatRounded = round(float(minFloat), 3)
+            
 
 
             url = f'{self.base_url}/steam_links_search'
@@ -143,7 +146,8 @@ class Postgres:
                 'steamUrl': steamUrl,
                 'skinName': skinName,
                 'buffId': buffId,
-                'maxFloat': maxFloatRounded
+                'maxFloat': maxFloatRounded,
+                'minFloat': minFloatRounded,
             }) as response:
                 response.raise_for_status()
         except Exception as e:

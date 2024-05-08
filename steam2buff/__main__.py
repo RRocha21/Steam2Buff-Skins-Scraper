@@ -29,10 +29,10 @@ async def main_loop(buff, steam, rates, postgres, sheets):
     logger.info(f'Fetched {len(sheet_data)} items from Google Sheets')
     
     for item in sheet_data:
-        await asyncio.sleep(0.1)
         logger.info(f'Fetching {item}')
         await postgres.insert_one_steam_2_search(item)
 
+    exit('Program finished')
 
 
 async def main():
