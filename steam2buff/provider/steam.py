@@ -359,7 +359,7 @@ class Steam:
             return None
 
         return {
-            'price': int(decimal.Decimal(self.currency_pattern.sub('', res['lowest_price'])) * 100),
+            'price': int(decimal.Decimal(self.currency_pattern.sub('', res['lowest_price']))),
             'volume': int(res.get('volume', '0').replace(',', '')),
         }
         

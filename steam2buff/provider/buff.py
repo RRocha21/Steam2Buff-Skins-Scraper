@@ -10,7 +10,7 @@ from steam2buff.exceptions import BuffError
 class Buff:
     base_url = 'https://buff.163.com'
 
-    web_goods = '/api/market/goods'
+    web_goods = '/market/goods'
     web_withdraw = '/api/market/backpack/withdraw'
     web_backpack = '/api/market/backpack'
     web_sell_order = '/api/market/goods/sell_order'
@@ -48,12 +48,18 @@ class Buff:
                 logger.debug(f'Waiting {self.request_interval - elapsed:.2f} seconds before next request({url})...')
                 await asyncio.sleep(self.request_interval - elapsed)
             self.request_locks[url][1] = time.monotonic()
-
+            
             response = await self.opener.request(*args, **kwargs)
-            if response.json()['code'] != 'OK':
-                raise BuffError(response.json())
+            # logger.info(f'Response: {response.json()}')
+            try: 
+                response_json = response.json()
+            except:
+                return None
+            
+            if response_json and response_json.get('code') != 'OK':
+                return None
 
-            return response.json()['data']
+            return response_json
 
     async def get_total_page(self):
         response = await self._request('get', self.web_goods, params={   
@@ -70,3 +76,21 @@ class Buff:
         })
 
         return response.get('items')
+    
+    async def get_min_price(self, skin_id, max_float):
+        response = await self._request('get', self.web_sell_order, params={
+            'game': self.game,
+            'goods_id': skin_id,
+            'max_paintwear': max_float,
+            'sort_by': 'default',
+            'allow_tradable_cooldown': '1',
+            'page_num': 1,
+            'mode': ''
+        })
+        if response is None:
+            return None
+        if response.get('data').get('total_page') == 0:
+            return None
+        else: 
+            return response.get('data').get('items')[0].get('price')
+

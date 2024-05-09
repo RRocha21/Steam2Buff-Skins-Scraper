@@ -148,3 +148,37 @@ class Postgres:
                 response.raise_for_status()
         except Exception as e:
             logger.error(f'Failed to insert document into PostgreSQL: {e}')
+            
+    async def fetch_steam_2_search(self):
+        try:
+            url = f'{self.base_url}/steam_links_search'
+            async with self.session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data
+                return None
+        except Exception as e:
+            logger.error(f'Failed to fetch steam 2 search: {e}')
+            return None
+        
+    async def insert_into_steam_links(self, document):
+        try:
+            link = document['link']
+            max_float = document['max_float']
+            max_price = document['max_price']
+            status = document['status']
+            max_float = round(float(max_float), 3)
+            max_price = round(float(max_price), 2)
+            buff_id = document['buff_id']
+
+            url = f'{self.base_url}/steam_links'
+            async with self.session.post(url, params={
+                'link': link,
+                'max_float': max_float,
+                'max_price': max_price,
+                'status': status,
+                'buff_id': buff_id
+            }) as response:
+                response.raise_for_status()
+        except Exception as e:
+            logger.error(f'Failed to insert document into PostgreSQL: {e}')
