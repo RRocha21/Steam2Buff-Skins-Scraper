@@ -14,6 +14,8 @@ import json
 
 import time
 
+from urllib.parse import unquote
+
 visited = set()
 
 async def reset_visited():
@@ -53,39 +55,91 @@ async def main_loop(buff, steam, rates, postgres):
         data = await postgres.fetch_steam_2_search()
 
         for item in data:
-            # Fetch min price from Steam
-            steam_price = await steam.get_min_price(item['market_hash_name'])
+            item_skin_name = item['skinname']
+            item_buff_id = item['buffid']
+            item_buff_url = item['buffurl']
+            item_steam_url = item['steamurl']
+            item_min_float = round(float(item['minfloat']),3)
+            item_max_float = round(float(item['maxfloat']),3)
+            item_status = item['status']
             
-            if steam_price is None:
+            
+            
+            # Fetch min price from Steam
+            market_hash = unquote(item_steam_url.split("/")[-1])
+            steam_overview = await steam.price_overview_data(market_hash)
+            
+            if steam_overview is None:
                 continue
             
+            # Give a 5% margin to the min price
+            steam_min_price = steam_overview['price'] * 1.05
             # Fetch min price from Buff starting on the max float
             
-            # buff_min_price = await buff.get_min_price(item['market_hash_name'], steam_price)
+            float_interval = 0.1
+            if (item_max_float == 0.27):
+                float_interval = 0.01
+            else:
+                float_interval = 0.005
+                
+            logger.info(f'Skin Name: {item_skin_name}')
+            logger.info(f'Buff URL: {item_buff_url}')
+            logger.info(f'Buff ID: {item_buff_id}')
+            logger.info(f'Steam URL: {item_steam_url}')
             
-            # if buff_min_price is None:
-            #     continue
+            last_buff_price = None
+            last_steam_price = None
+            last_max_float = None
             
-            # # Calculate profit in percentage
-            # profit = (buff_min_price - steam_price) / steam_price * 100
+            retries_with_same_price = 0
+
             
-            # # Check if the item is profitable or until 10% loss
-            # if profit >= 10:
-            #     if item['market_hash_name'] not in visited:
-            #         visited.add(item['market_hash_name'])
+            for x in range(int(item_min_float*1000) + int(float_interval*1000), int(item_max_float*1000), int(float_interval*1000)):
+                current_float = x/1000
+                logger.info(f'Current x: {x/1000}')
+                buff_min_price = await buff.get_min_price(item_buff_id, current_float)
+                logger.info(f'Buff min price: {buff_min_price}')
+                
+                if buff_min_price is None:
+                    continue
+                
+                
+                max_loss = 0.95 # 10% loss
+                
+                loss_percent = (float(buff_min_price) / float(steam_min_price))
+                if loss_percent > max_loss:
+                    if (last_buff_price == buff_min_price):
+                        retries_with_same_price += 1
+                    else:
+                        retries_with_same_price = 0
+                        
+                    if retries_with_same_price > 2:
+                        break;
+
+                    last_buff_price = buff_min_price
+                    last_steam_price = steam_min_price
+                    last_max_float = current_float
+                    continue
+                else:
+                    break
+            
+            if last_buff_price is not None and last_steam_price is not None and last_max_float is not None:
+                logger.info(f'Last Buff Price: {last_buff_price}')
+                logger.info(f'Last Steam Price: {last_steam_price}')
+                logger.info(f'Last Max Float: {last_max_float}')
+                
+                if retries_with_same_price <= 2:
+                    # Insert into PostgreSQL
+                    psql_steam_2_buff = {
+                        'link': item_steam_url,
+                        'max_float': last_max_float,
+                        'max_price': last_steam_price,
+                        'status': True,
+                        'buff_id': item_buff_id,
+                    }
+                    await postgres.insert_into_steam_links(psql_steam_2_buff)
                     
-            #         # Insert item into PostgreSQL
-            #         await postgres.insert_steam_2_buff({
-            #             'market_hash_name': item['market_hash_name'],
-            #             'steam_price': steam_price,
-            #             'buff_min_price': buff_min_price,
-            #             'profit': profit
-            #         })
-            #         logger.info(f'Item {item["market_hash_name"]} is profitable: {profit:.2f}%')
-            #     else:
-            #         logger.info(f'Item {item["market_hash_name"]} is already visited')
-            # else:
-            #     logger.info(f'Item {item["market_hash_name"]} is not profitable: {profit:.2f}%')
+                    logger.info(f'Inserted {item_skin_name} into PostgreSQL')
 
 
 async def main():
