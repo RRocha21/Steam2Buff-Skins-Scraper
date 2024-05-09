@@ -113,7 +113,7 @@ async def main_loop(buff, steam, rates, postgres):
                     else:
                         retries_with_same_price = 0
                         
-                    if retries_with_same_price > 2:
+                    if retries_with_same_price > 1:
                         break;
 
                     last_buff_price = buff_min_price
@@ -128,18 +128,17 @@ async def main_loop(buff, steam, rates, postgres):
                 logger.info(f'Last Steam Price: {last_steam_price}')
                 logger.info(f'Last Max Float: {last_max_float}')
                 
-                if retries_with_same_price <= 2:
-                    # Insert into PostgreSQL
-                    psql_steam_2_buff = {
-                        'link': item_steam_url,
-                        'max_float': last_max_float,
-                        'max_price': last_steam_price,
-                        'status': True,
-                        'buff_id': item_buff_id,
-                    }
-                    await postgres.insert_into_steam_links(psql_steam_2_buff)
+                # Insert into PostgreSQL
+                psql_steam_2_buff = {
+                    'link': item_steam_url,
+                    'max_float': last_max_float,
+                    'max_price': last_steam_price,
+                    'status': True,
+                    'buff_id': item_buff_id,
+                }
+                await postgres.insert_into_steam_links(psql_steam_2_buff)
                     
-                    logger.info(f'Inserted {item_skin_name} into PostgreSQL')
+                logger.info(f'Inserted {item_skin_name} into PostgreSQL')
 
 
 async def main():
