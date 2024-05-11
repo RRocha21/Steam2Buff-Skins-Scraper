@@ -130,7 +130,7 @@ async def main_loop(buff, steam, rates, postgres):
                     
                 logger.info(f'Inserted {item_skin_name} into PostgreSQL')
             else:
-                
+                await postgres.update_steam_2_search(item_buff_id, 'False')
 
 
 async def main():
