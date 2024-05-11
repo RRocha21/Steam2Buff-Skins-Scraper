@@ -2,4 +2,4 @@
 
 set -eu
 
-.venv/bin/python3 -m buff2steam
+.venv/bin/python3 -m steam2buff

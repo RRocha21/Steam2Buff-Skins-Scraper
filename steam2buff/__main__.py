@@ -81,11 +81,6 @@ async def main_loop(buff, steam, rates, postgres):
                 float_interval = 0.01
             else:
                 float_interval = 0.005
-                
-            logger.info(f'Skin Name: {item_skin_name}')
-            logger.info(f'Buff URL: {item_buff_url}')
-            logger.info(f'Buff ID: {item_buff_id}')
-            logger.info(f'Steam URL: {item_steam_url}')
             
             last_buff_price = None
             last_steam_price = None
@@ -96,9 +91,7 @@ async def main_loop(buff, steam, rates, postgres):
             
             for x in range(int(item_min_float*1000) + int(float_interval*1000), int(item_max_float*1000), int(float_interval*1000)):
                 current_float = x/1000
-                logger.info(f'Current x: {x/1000}')
                 buff_min_price = await buff.get_min_price(item_buff_id, current_float)
-                logger.info(f'Buff min price: {buff_min_price}')
                 
                 if buff_min_price is None:
                     continue
@@ -112,33 +105,32 @@ async def main_loop(buff, steam, rates, postgres):
                         retries_with_same_price += 1
                     else:
                         retries_with_same_price = 0
+                        last_buff_price = buff_min_price
+                        last_steam_price = steam_min_price
+                        last_max_float = current_float
                         
-                    if retries_with_same_price > 1:
+                    if retries_with_same_price > 2:
                         break;
 
-                    last_buff_price = buff_min_price
-                    last_steam_price = steam_min_price
-                    last_max_float = current_float
                     continue
                 else:
                     break
             
             if last_buff_price is not None and last_steam_price is not None and last_max_float is not None:
-                logger.info(f'Last Buff Price: {last_buff_price}')
-                logger.info(f'Last Steam Price: {last_steam_price}')
-                logger.info(f'Last Max Float: {last_max_float}')
                 
                 # Insert into PostgreSQL
                 psql_steam_2_buff = {
                     'link': item_steam_url,
                     'max_float': last_max_float,
                     'max_price': last_steam_price,
-                    'status': True,
+                    'status': 'True',
                     'buff_id': item_buff_id,
                 }
                 await postgres.insert_into_steam_links(psql_steam_2_buff)
                     
                 logger.info(f'Inserted {item_skin_name} into PostgreSQL')
+            else:
+                
 
 
 async def main():
