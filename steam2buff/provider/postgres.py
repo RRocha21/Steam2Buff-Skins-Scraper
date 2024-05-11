@@ -182,3 +182,14 @@ class Postgres:
                 response.raise_for_status()
         except Exception as e:
             logger.error(f'Failed to insert document into PostgreSQL: {e}')
+            
+    async def update_steam_2_search(self, buff_id, status):
+        try:
+            url = f'{self.base_url}/steam_links_search_update'
+            async with self.session.post(url, params={
+                'buffId': buff_id,
+                'status': status
+            }) as response:
+                response.raise_for_status()
+        except Exception as e:
+            logger.error(f'Failed to update steam 2 search: {e}')
