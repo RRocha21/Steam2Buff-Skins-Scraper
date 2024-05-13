@@ -61,9 +61,7 @@ async def main_loop(buff, steam, rates, postgres):
             item_steam_url = item['steamurl']
             item_min_float = round(float(item['minfloat']),3)
             item_max_float = round(float(item['maxfloat']),3)
-            item_status = item['status']
-            
-            
+            item_status = item['status']            
             
             # Fetch min price from Steam
             market_hash = unquote(item_steam_url.split("/")[-1])
@@ -118,11 +116,13 @@ async def main_loop(buff, steam, rates, postgres):
             
             if last_buff_price is not None and last_steam_price is not None and last_max_float is not None:
                 
+                max_price_eur = await rates.get_correct_price(exchange_rates, 'CNY', last_steam_price)
+                
                 # Insert into PostgreSQL
                 psql_steam_2_buff = {
                     'link': item_steam_url,
                     'max_float': last_max_float,
-                    'max_price': last_steam_price,
+                    'max_price': max_price_eur,
                     'status': 'True',
                     'buff_id': item_buff_id,
                 }
