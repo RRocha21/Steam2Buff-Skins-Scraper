@@ -117,7 +117,7 @@ async def main_loop(buff, steam, rates, postgres):
             if last_buff_price is not None and last_steam_price is not None and last_max_float is not None:
                 
                 max_price_eur = await rates.get_correct_price(exchange_rates, 'CNY', last_steam_price)
-                
+                max_price_eur = max_price_eur * 10
                 # Insert into PostgreSQL
                 psql_steam_2_buff = {
                     'link': item_steam_url,
